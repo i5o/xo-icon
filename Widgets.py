@@ -31,6 +31,7 @@ from gi.repository import GObject
 
 from sugar3.graphics.icon import Icon
 from sugar3.graphics.xocolor import XoColor
+from sugar3.graphics import style
 
 
 def get_current_icon():
@@ -57,7 +58,8 @@ def get_icons(path):
     icons = ['computer-xo']
     for icon in list_icons:
         icon_path = os.path.join(path, icon)
-        if not icon_path:
+        if not icon_path or os.path.isdir(icon_path) or \
+        not os.path.exists(icon_path):
             continue
 
         mimetype = mimetypes.guess_type(icon_path)[0]
@@ -75,16 +77,6 @@ class XoHome(Gtk.Fixed):
     def __init__(self, icon):
         super(XoHome, self).__init__()
 
-        self.home = Gtk.Image()
-        self.home.set_from_file("images/Home.png")
-
-        self.home_box = Gtk.EventBox()
-        x = Gdk.Screen.width()
-        self.home_box.set_size_request(x, -1)
-        self.home_box.add(self.home)
-
-        self.put(self.home_box, 0, 0)
-
         self.last_icon = icon
         self.update(None, icon)
 
@@ -93,12 +85,10 @@ class XoHome(Gtk.Fixed):
     def update(self, widget, icon):
         self.remove(self.last_icon)
         self.last_icon = icon
-        # Classmate:  X = 431
-        # XO: X = 521
-        X = 521
-        Y = 240
 
-        self.put(icon, X, Y)
+        x = x = int(Gdk.Screen.width() - style.XLARGE_ICON_SIZE) / 2
+        y = (Gdk.Screen.height() / 2) - style.XLARGE_ICON_SIZE
+        self.put(icon, x, y)
         self.show_all()
 
 
@@ -122,27 +112,35 @@ class XoIcons(Gtk.Box):
         client = GConf.Client.get_default()
         path = "/desktop/sugar/user/color"
         color = client.get_string(path)
+        global xocolor
         xocolor = XoColor(color)
         current = get_current_icon()
 
         for icon_name in icons:
             icon = Icon(icon_name=icon_name, xo_color=xocolor,
-                                pixel_size=100)
+                                pixel_size=style.MEDIUM_ICON_SIZE)
 
             icon_box = Gtk.EventBox()
             icon_box.add(icon)
             icon_box.connect("button-press-event", self.update)
+            size = style.MEDIUM_ICON_SIZE + 20
+            icon_box.set_size_request(size, size)
 
             icon_fixed = Icon(icon_name=icon_name, xo_color=xocolor,
-                                pixel_size=146)
+                                pixel_size=style.XLARGE_ICON_SIZE)
+            icon_fixed.set_tooltip_text(icon_name)
+            icon_fixed.set_property("has-tooltip", False)
+
             icon_box.set_tooltip_text(icon_name)
             icon_box.set_property("has-tooltip", False)
 
-            self.pack_start(icon_box, True, True, 0)
+            self.pack_start(icon_box, False, False, 0)
             self.pack_start(Gtk.VSeparator(), False, False, 3)
 
             if icon_name == current:
                 self.icon = icon_fixed
+                self.icon_real = icon_box
+                icon_box.set_sensitive(False)
             self.icons[icon_box] = icon_fixed
 
     def get_icon(self):
@@ -150,9 +148,16 @@ class XoIcons(Gtk.Box):
 
     def update(self, widget, event):
         self.emit('icon_changed', self.icons[widget])
+        self.icon_real.set_sensitive(True)
+
+        self.icon = self.icons[widget]
+
+        self.icon_real = widget
+        self.icon_real.set_sensitive(False)
 
 
 class XoIcon(Gtk.Box):
+
     def __init__(self):
         super(XoIcon, self).__init__(orientation=Gtk.Orientation.VERTICAL)
 
@@ -168,7 +173,7 @@ class XoIcon(Gtk.Box):
 
         self.icons_box = Gtk.EventBox()
         self.icons_box.modify_bg(Gtk.StateType.NORMAL,
-                            Gdk.color_parse("white"))
+                           Gdk.color_parse("white"))
         self.icons_box.add(self.icons)
 
         self.icons_scroll = Gtk.ScrolledWindow()
@@ -176,8 +181,13 @@ class XoIcon(Gtk.Box):
                                     Gtk.PolicyType.AUTOMATIC)
         self.icons_scroll.add_with_viewport(self.icons_box)
 
-        self.icons_scroll.set_size_request(-1, 143)
+        self.icons_scroll.set_size_request(-1, style.MEDIUM_ICON_SIZE + 30)
 
         self.pack_start(self.home_box, True, True, 0)
+        self.pack_start(Gtk.HSeparator(), False, False, 0)
         self.pack_start(self.icons_scroll, False, False, 0)
+
         self.show_all()
+
+    def get_icon(self):
+        return self.icons.get_icon().get_tooltip_text()
