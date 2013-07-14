@@ -23,6 +23,7 @@
 #
 
 import os
+import math
 import mimetypes
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -32,6 +33,9 @@ from gi.repository import GObject
 from sugar3.graphics.icon import Icon
 from sugar3.graphics.xocolor import XoColor
 from sugar3.graphics import style
+
+SUGAR_ICONS = ['activity-web', 'activity-pippy', 'activity-turtleart',
+                    'activity-read', 'activity-write']
 
 
 def get_current_icon():
@@ -74,8 +78,21 @@ class XoHome(Gtk.Fixed):
     """
     Simulate XO Home with custom icon.
     """
-    def __init__(self, icon):
+    def __init__(self, icon, activity_path):
         super(XoHome, self).__init__()
+
+        radius = min(Gdk.Screen.width(), Gdk.Screen.height())
+        radius /= 4
+        angle = 0
+        for svg in SUGAR_ICONS:
+            pathname = os.path.join(activity_path, 'icons', svg + ".svg")
+            image = Gtk.Image.new_from_file(pathname)
+            x = math.sin(angle) * radius
+            y = math.cos(angle) * radius
+            x += (Gdk.Screen.width() / 2) - style.LARGE_ICON_SIZE / 2
+            y += (Gdk.Screen.height() / 2) - style.LARGE_ICON_SIZE
+            self.put(image, int(x), int(y))
+            angle += math.pi * 2 / len(SUGAR_ICONS)
 
         self.last_icon = icon
         self.update(None, icon)
@@ -158,11 +175,11 @@ class XoIcons(Gtk.Box):
 
 class XoIcon(Gtk.Box):
 
-    def __init__(self):
+    def __init__(self, activity_path):
         super(XoIcon, self).__init__(orientation=Gtk.Orientation.VERTICAL)
 
         self.icons = XoIcons()
-        self.home = XoHome(self.icons.get_icon())
+        self.home = XoHome(self.icons.get_icon(), activity_path)
 
         self.icons.connect("icon_changed", self.home.update)
 

@@ -66,7 +66,7 @@ class IconChangeActivity(activity.Activity):
         self.toolbar.insert(separator, -1)
         self.toolbar.insert(stop_button, -1)
 
-        self.canvas = XoIcon()
+        self.canvas = XoIcon(activity.get_bundle_path())
 
         self.set_toolbar_box(self.toolbar_box)
         self.set_canvas(self.canvas)
