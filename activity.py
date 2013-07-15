@@ -72,29 +72,33 @@ class IconChangeActivity(activity.Activity):
         self.toolbar.insert(separator, -1)
         self.toolbar.insert(stop_button, -1)
 
-        # We may have to add an comuter-xo icon to ~/.icons
+        # We need: ~/.icons/sugar/scalabale/device/
+        #          ~/.icons/computer-xo.svg
+        #          ~/.icons/sugar/index.theme
         root_path = os.path.join(os.path.expanduser('~'), '.icons')
+        if not os.path.exists(os.path.join(root_path)):
+            subprocess.check_output(['mkdir', os.path.join(root_path)])
+        if not os.path.exists(os.path.join(root_path, 'sugar')):
+            subprocess.check_output(['mkdir',
+                                     os.path.join(root_path, 'sugar')])
+        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable')):
+            subprocess.check_output(['mkdir',
+                                     os.path.join(root_path, 'sugar',
+                                                  'scalable')])
+        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable',
+                                           'device')):
+            subprocess.check_output(['mkdir', os.path.join(root_path, 'sugar',
+                                                           'scalable',
+                                                           'device')])
         if not os.path.exists(os.path.join(root_path, DEFAULT_ICON + '.svg')):
             from_path = os.path.join(activity.get_bundle_path(),
                                      'icons', DEFAULT_ICON + '.svg') 
-            command = ['cp', from_path, root_path]
-            subprocess.check_output(command)
-        if not os.path.exists(os.path.join(root_path, 'sugar')):
-            command = ['mkdir', os.path.join(root_path, 'sugar')]
-            subprocess.check_output(command)
-        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable')):
-            command = ['mkdir', os.path.join(root_path, 'sugar', 'scalable')]
-            subprocess.check_output(command)
-        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable',
-                                           'device')):
-            command = ['mkdir', os.path.join(root_path, 'sugar', 'scalable',
-                                             'device')]
-            subprocess.check_output(command)
+            subprocess.check_output(['cp', from_path, root_path])
         if not os.path.exists(os.path.join(root_path, 'sugar', 'index.theme')):
-            command = ['cp',
-                       os.path.join(activity.get_bundle_path(), 'index.theme'),
-                       os.path.join(root_path, 'sugar')]
-            subprocess.check_output(command)
+            subprocess.check_output(['cp',
+                                     os.path.join(activity.get_bundle_path(),
+                                                  'index.theme'),
+                                     os.path.join(root_path, 'sugar')])
 
         self.canvas = XoIcon(activity.get_bundle_path())
 
