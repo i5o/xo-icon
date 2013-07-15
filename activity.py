@@ -79,6 +79,22 @@ class IconChangeActivity(activity.Activity):
                                      'icons', DEFAULT_ICON + '.svg') 
             command = ['cp', from_path, root_path]
             subprocess.check_output(command)
+        if not os.path.exists(os.path.join(root_path, 'sugar')):
+            command = ['mkdir', os.path.join(root_path, 'sugar')]
+            subprocess.check_output(command)
+        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable')):
+            command = ['mkdir', os.path.join(root_path, 'sugar', 'scalable')]
+            subprocess.check_output(command)
+        if not os.path.exists(os.path.join(root_path, 'sugar', 'scalable',
+                                           'device')):
+            command = ['mkdir', os.path.join(root_path, 'sugar', 'scalable',
+                                             'device')]
+            subprocess.check_output(command)
+        if not os.path.exists(os.path.join(root_path, 'sugar', 'index.theme')):
+            command = ['cp',
+                       os.path.join(activity.get_bundle_path(), 'index.theme'),
+                       os.path.join(root_path, 'sugar')]
+            subprocess.check_output(command)
 
         self.canvas = XoIcon(activity.get_bundle_path())
 
