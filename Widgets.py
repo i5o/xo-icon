@@ -35,7 +35,7 @@ from sugar3.graphics.xocolor import XoColor
 from sugar3.graphics import style
 
 SUGAR_ICONS = ['activity-web', 'activity-pippy', 'activity-turtleart',
-                    'activity-read', 'activity-write']
+               'activity-read', 'activity-write']
 
 
 def get_current_icon():
@@ -63,7 +63,7 @@ def get_icons(path):
     for icon in list_icons:
         icon_path = os.path.join(path, icon)
         if not icon_path or os.path.isdir(icon_path) or \
-        not os.path.exists(icon_path):
+                not os.path.exists(icon_path):
             continue
 
         mimetype = mimetypes.guess_type(icon_path)[0]
@@ -112,8 +112,8 @@ class XoHome(Gtk.Fixed):
 class XoIcons(Gtk.Box):
 
     __gsignals__ = {
-    'icon_changed': (GObject.SIGNAL_RUN_FIRST,
-        GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
+        'icon_changed': (GObject.SIGNAL_RUN_FIRST,
+                         GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
 
     def __init__(self):
         super(XoIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL)
@@ -135,7 +135,7 @@ class XoIcons(Gtk.Box):
 
         for icon_name in icons:
             icon = Icon(icon_name=icon_name, xo_color=xocolor,
-                                pixel_size=style.MEDIUM_ICON_SIZE)
+                        pixel_size=style.MEDIUM_ICON_SIZE)
 
             icon_box = Gtk.EventBox()
             icon_box.add(icon)
@@ -144,7 +144,7 @@ class XoIcons(Gtk.Box):
             icon_box.set_size_request(size, size)
 
             icon_fixed = Icon(icon_name=icon_name, xo_color=xocolor,
-                                pixel_size=style.XLARGE_ICON_SIZE)
+                              pixel_size=style.XLARGE_ICON_SIZE)
             icon_fixed.set_tooltip_text(icon_name)
             icon_fixed.set_property("has-tooltip", False)
 
@@ -185,17 +185,17 @@ class XoIcon(Gtk.Box):
 
         self.home_box = Gtk.EventBox()
         self.home_box.modify_bg(Gtk.StateType.NORMAL,
-                            Gdk.color_parse("white"))
+                                Gdk.color_parse("white"))
         self.home_box.add(self.home)
 
         self.icons_box = Gtk.EventBox()
         self.icons_box.modify_bg(Gtk.StateType.NORMAL,
-                           Gdk.color_parse("white"))
+                                 Gdk.color_parse("white"))
         self.icons_box.add(self.icons)
 
         self.icons_scroll = Gtk.ScrolledWindow()
         self.icons_scroll.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                    Gtk.PolicyType.AUTOMATIC)
+                                     Gtk.PolicyType.AUTOMATIC)
         self.icons_scroll.add_with_viewport(self.icons_box)
 
         self.icons_scroll.set_size_request(-1, style.MEDIUM_ICON_SIZE + 30)

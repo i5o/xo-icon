@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #
 #
-import logging
+
 import os
 import subprocess
 
@@ -92,7 +92,7 @@ class IconChangeActivity(activity.Activity):
                                                            'device')])
         if not os.path.exists(os.path.join(root_path, DEFAULT_ICON + '.svg')):
             from_path = os.path.join(activity.get_bundle_path(),
-                                     'icons', DEFAULT_ICON + '.svg') 
+                                     'icons', DEFAULT_ICON + '.svg')
             subprocess.check_output(['cp', from_path, root_path])
         if not os.path.exists(os.path.join(root_path, 'sugar', 'index.theme')):
             subprocess.check_output(['cp',
@@ -117,7 +117,7 @@ class IconChangeActivity(activity.Activity):
         if icon == DEFAULT_ICON:
             command = ['rm', to_path]
         else:
-            from_path = os.path.join(root_path, icon + '.svg') 
+            from_path = os.path.join(root_path, icon + '.svg')
             command = ['cp', from_path, to_path]
         subprocess.check_output(command)
         return True
