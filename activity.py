@@ -61,9 +61,9 @@ class IconChangeActivity(activity.Activity):
         separator.props.draw = False
         separator.set_expand(True)
 
-        self.confirm_button = ToolButton("dialog-ok")
-        self.confirm_button.set_tooltip(_("Apply changes"))
-        self.confirm_button.connect("clicked", self.apply_changes)
+        self.confirm_button = ToolButton('dialog-ok')
+        self.confirm_button.set_tooltip(_('Apply changes'))
+        self.confirm_button.connect('clicked', self.apply_changes)
 
         self.toolbar.insert(activity_button, 0)
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)

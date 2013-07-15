@@ -40,12 +40,12 @@ SUGAR_ICONS = ['activity-web', 'activity-pippy', 'activity-turtleart',
 
 def get_current_icon():
     client = GConf.Client.get_default()
-    path = "/desktop/sugar/user/icon"
+    path = '/desktop/sugar/user/icon'
     value = client.get_string(path)
     if value:
         return value
     else:
-        return "computer-xo"
+        return 'computer-xo'
 
 
 def get_icons(path):
@@ -67,7 +67,7 @@ def get_icons(path):
             continue
 
         mimetype = mimetypes.guess_type(icon_path)[0]
-        if "svg" in mimetype:
+        if 'svg' in mimetype:
             icon_name = icon[:-4]
             if not icon_name in icons:
                 icons.append(icon_name)
@@ -75,9 +75,9 @@ def get_icons(path):
 
 
 class XoHome(Gtk.Fixed):
-    """
+    '''
     Simulate XO Home with custom icon.
-    """
+    '''
     def __init__(self, icon, activity_path):
         super(XoHome, self).__init__()
 
@@ -85,7 +85,7 @@ class XoHome(Gtk.Fixed):
         radius /= 4
         angle = 0
         for svg in SUGAR_ICONS:
-            pathname = os.path.join(activity_path, 'icons', svg + ".svg")
+            pathname = os.path.join(activity_path, 'icons', svg + '.svg')
             image = Gtk.Image.new_from_file(pathname)
             x = math.sin(angle) * radius
             y = math.cos(angle) * radius
@@ -118,7 +118,7 @@ class XoIcons(Gtk.Box):
     def __init__(self):
         super(XoIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL)
 
-        path = os.path.join(os.path.expanduser("~"), ".icons")
+        path = os.path.join(os.path.expanduser('~'), '.icons')
         self.list_icons = get_icons(path)
         self.icons = {}
         self.fill_list(self.list_icons)
@@ -127,7 +127,7 @@ class XoIcons(Gtk.Box):
     def fill_list(self, icons):
 
         client = GConf.Client.get_default()
-        path = "/desktop/sugar/user/color"
+        path = '/desktop/sugar/user/color'
         color = client.get_string(path)
         global xocolor
         xocolor = XoColor(color)
@@ -139,17 +139,17 @@ class XoIcons(Gtk.Box):
 
             icon_box = Gtk.EventBox()
             icon_box.add(icon)
-            icon_box.connect("button-press-event", self.update)
+            icon_box.connect('button-press-event', self.update)
             size = style.MEDIUM_ICON_SIZE + 20
             icon_box.set_size_request(size, size)
 
             icon_fixed = Icon(icon_name=icon_name, xo_color=xocolor,
                               pixel_size=style.XLARGE_ICON_SIZE)
             icon_fixed.set_tooltip_text(icon_name)
-            icon_fixed.set_property("has-tooltip", False)
+            icon_fixed.set_property('has-tooltip', False)
 
             icon_box.set_tooltip_text(icon_name)
-            icon_box.set_property("has-tooltip", False)
+            icon_box.set_property('has-tooltip', False)
 
             self.pack_start(icon_box, False, False, 0)
             self.pack_start(Gtk.VSeparator(), False, False, 3)
@@ -181,16 +181,16 @@ class XoIcon(Gtk.Box):
         self.icons = XoIcons()
         self.home = XoHome(self.icons.get_icon(), activity_path)
 
-        self.icons.connect("icon_changed", self.home.update)
+        self.icons.connect('icon_changed', self.home.update)
 
         self.home_box = Gtk.EventBox()
         self.home_box.modify_bg(Gtk.StateType.NORMAL,
-                                Gdk.color_parse("white"))
+                                Gdk.color_parse('white'))
         self.home_box.add(self.home)
 
         self.icons_box = Gtk.EventBox()
         self.icons_box.modify_bg(Gtk.StateType.NORMAL,
-                                 Gdk.color_parse("white"))
+                                 Gdk.color_parse('white'))
         self.icons_box.add(self.icons)
 
         self.icons_scroll = Gtk.ScrolledWindow()
