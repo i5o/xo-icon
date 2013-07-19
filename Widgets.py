@@ -4,6 +4,7 @@
 #  Widgets.py
 #
 #  Copyright 2013 Ignacio Rodríguez <ignacio@sugarlabs.org>
+#   SugarLabs - CeibalJAM! - Python Joven 2013
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -86,7 +87,7 @@ class XoHome(Gtk.Fixed):
         angle = 0
         for svg in SUGAR_ICONS:
             pathname = os.path.join(activity_path, 'icons', svg + '.svg')
-            image = Gtk.Image.new_from_file(pathname)
+            image = Icon(icon_name=svg, xo_color=xocolor, pixel_size=style.MEDIUM_ICON_SIZE)
             x = math.sin(angle) * radius
             y = math.cos(angle) * radius
             x += (Gdk.Screen.width() / 2) - style.LARGE_ICON_SIZE / 2
