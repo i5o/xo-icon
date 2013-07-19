@@ -66,11 +66,25 @@ def get_icons(path):
         if not icon_path or os.path.isdir(icon_path) or \
                 not os.path.exists(icon_path):
             continue
+        computer_xo_path = os.path.join(path, "sugar", "scalable",
+                                                    "device", "computer-xo.svg")
+        same_file = False
+        if os.path.exists(computer_xo_path):
+            computer_xo = open(computer_xo_path, "r")
+            xoicon = computer_xo.read()
+            computer_xo.close()
+            icon_f = open(icon_path, "r")
+            xoicon_two = icon_f.read()
+            icon_f.close()
+            if xoicon == xoicon_two:
+                same_file = True
 
         mimetype = mimetypes.guess_type(icon_path)[0]
         if 'svg' in mimetype:
             icon_name = icon[:-4]
-            if not icon_name in icons:
+            if not icon_name in icons \
+            and icon_name != "computer-xo-default" \
+            and not same_file:
                 icons.append(icon_name)
     return icons
 
@@ -86,8 +100,8 @@ class XoHome(Gtk.Fixed):
         radius /= 4
         angle = 0
         for svg in SUGAR_ICONS:
-            pathname = os.path.join(activity_path, 'icons', svg + '.svg')
-            image = Icon(icon_name=svg, xo_color=xocolor, pixel_size=style.MEDIUM_ICON_SIZE)
+            image = Icon(icon_name=svg, xo_color=xocolor,
+                pixel_size=style.MEDIUM_ICON_SIZE)
             x = math.sin(angle) * radius
             y = math.cos(angle) * radius
             x += (Gdk.Screen.width() / 2) - style.LARGE_ICON_SIZE / 2
@@ -116,10 +130,11 @@ class XoIcons(Gtk.Box):
         'icon_changed': (GObject.SIGNAL_RUN_FIRST,
                          GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
 
-    def __init__(self):
+    def __init__(self, default):
         super(XoIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL)
 
         path = os.path.join(os.path.expanduser('~'), '.icons')
+        self.is_default = default
         self.list_icons = get_icons(path)
         self.icons = {}
         self.fill_list(self.list_icons)
@@ -133,6 +148,8 @@ class XoIcons(Gtk.Box):
         global xocolor
         xocolor = XoColor(color)
         current = get_current_icon()
+        if not self.is_default:
+                    icons.append("computer-xo-default")
 
         for icon_name in icons:
             icon = Icon(icon_name=icon_name, xo_color=xocolor,
@@ -176,10 +193,10 @@ class XoIcons(Gtk.Box):
 
 class XoIcon(Gtk.Box):
 
-    def __init__(self, activity_path):
+    def __init__(self, activity_path, default):
         super(XoIcon, self).__init__(orientation=Gtk.Orientation.VERTICAL)
 
-        self.icons = XoIcons()
+        self.icons = XoIcons(default)
         self.home = XoHome(self.icons.get_icon(), activity_path)
 
         self.icons.connect('icon_changed', self.home.update)
