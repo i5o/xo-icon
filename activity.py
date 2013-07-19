@@ -146,7 +146,6 @@ class IconChangeActivity(activity.Activity):
 
         self.canvas = XoIcon(activity.get_bundle_path(), is_default)
 
-
         self.set_toolbar_box(self.toolbar_box)
         self.set_canvas(self.canvas)
         self.show_all()
