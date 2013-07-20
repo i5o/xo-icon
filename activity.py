@@ -30,7 +30,7 @@ from sugar3.activity import activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import StopButton
 from sugar3.graphics.toolbutton import ToolButton
-from sugar3.activity.widgets import _create_activity_icon as ActivityIcon
+from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.graphics.alert import NotifyAlert
 
 from gi.repository import Gtk
@@ -47,31 +47,27 @@ CONTROL_PANEL_ICON = 'module-about_me'
 class IconChangeActivity(activity.Activity):
 
     def __init__(self, handle):
-        activity.Activity.__init__(self, handle, False)
+        activity.Activity.__init__(self, handle)
         self.max_participants = 1
 
         self.toolbar_box = ToolbarBox()
         self.toolbar = self.toolbar_box.toolbar
 
-        activity_button = ToolButton()
-        icon = ActivityIcon(None)
-        activity_button.set_icon_widget(icon)
-        activity_button.set_tooltip(self.get_title())
-        stop_button = StopButton(self)
-
-        separator = Gtk.SeparatorToolItem()
-        separator.props.draw = False
-        separator.set_expand(True)
+        activity_button = ActivityToolbarButton(self)
+        self.toolbar.insert(activity_button, 0)
+        activity_button.show()
 
         self.confirm_button = ToolButton('dialog-ok')
         self.confirm_button.set_tooltip(_('Apply changes'))
         self.confirm_button.connect('clicked', self.apply_changes)
-
-        self.toolbar.insert(activity_button, 0)
-        self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
         self.toolbar.insert(self.confirm_button, -1)
 
+        separator = Gtk.SeparatorToolItem()
+        separator.props.draw = False
+        separator.set_expand(True)
         self.toolbar.insert(separator, -1)
+
+        stop_button = StopButton(self)
         self.toolbar.insert(stop_button, -1)
 
         # We need: ~/.icons/sugar/scalabale/device/
