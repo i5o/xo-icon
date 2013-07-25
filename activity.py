@@ -26,14 +26,14 @@
 import os
 import subprocess
 
-from sugar3.activity import activity
-from sugar3.graphics.toolbarbox import ToolbarBox
-from sugar3.activity.widgets import StopButton
-from sugar3.graphics.toolbutton import ToolButton
-from sugar3.activity.widgets import ActivityToolbarButton
-from sugar3.graphics.alert import NotifyAlert
+from sugar.activity import activity
+from sugar.graphics.toolbarbox import ToolbarBox
+from sugar.activity.widgets import StopButton
+from sugar.graphics.toolbutton import ToolButton
+from sugar.activity.widgets import ActivityToolbarButton
+from sugar.graphics.alert import NotifyAlert
 
-from gi.repository import Gtk
+import gtk
 
 from Widgets import XoIcon
 
@@ -62,7 +62,7 @@ class IconChangeActivity(activity.Activity):
         self.confirm_button.connect('clicked', self.apply_changes)
         self.toolbar.insert(self.confirm_button, -1)
 
-        separator = Gtk.SeparatorToolItem()
+        separator = gtk.SeparatorToolItem()
         separator.props.draw = False
         separator.set_expand(True)
         self.toolbar.insert(separator, -1)

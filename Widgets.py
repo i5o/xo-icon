@@ -26,21 +26,21 @@
 import os
 import math
 import mimetypes
-from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GConf
-from gi.repository import GObject
 
-from sugar3.graphics.icon import Icon
-from sugar3.graphics.xocolor import XoColor
-from sugar3.graphics import style
+import gtk
+import gconf
+import gobject
+
+from sugar.graphics.icon import Icon
+from sugar.graphics.xocolor import XoColor
+from sugar.graphics import style
 
 SUGAR_ICONS = ['activity-web', 'activity-pippy', 'activity-turtleart',
                'activity-read', 'activity-write']
 
 
 def get_current_icon():
-    client = GConf.Client.get_default()
+    client = gconf.client_get_default()
     path = '/desktop/sugar/user/icon'
     value = client.get_string(path)
     if value:
@@ -53,7 +53,7 @@ def get_icons(path):
     if not os.path.exists(path):
         os.mkdir(path)
 
-    icon_theme = Gtk.IconTheme.get_default()
+    icon_theme = gtk.icon_theme_get_default()
     if not path in icon_theme.get_search_path():
         icon_theme.append_search_path(path)
 
@@ -89,14 +89,14 @@ def get_icons(path):
     return icons
 
 
-class XoHome(Gtk.Fixed):
+class XoHome(gtk.Fixed):
     '''
     Simulate XO Home with custom icon.
     '''
     def __init__(self, icon, activity_path):
         super(XoHome, self).__init__()
 
-        radius = min(Gdk.Screen.width(), Gdk.Screen.height())
+        radius = min(gtk.gdk.screen_width(), gtk.gdk.screen_height())
         radius /= 4
         angle = 0
         for svg in SUGAR_ICONS:
@@ -104,8 +104,8 @@ class XoHome(Gtk.Fixed):
                 pixel_size=style.MEDIUM_ICON_SIZE)
             x = math.sin(angle) * radius
             y = math.cos(angle) * radius
-            x += (Gdk.Screen.width() / 2) - style.LARGE_ICON_SIZE / 2
-            y += (Gdk.Screen.height() / 2) - style.LARGE_ICON_SIZE
+            x += (gtk.gdk.screen_width() / 2) - style.LARGE_ICON_SIZE / 2
+            y += (gtk.gdk.screen_height() / 2) - style.LARGE_ICON_SIZE
             self.put(image, int(x), int(y))
             angle += math.pi * 2 / len(SUGAR_ICONS)
 
@@ -118,20 +118,20 @@ class XoHome(Gtk.Fixed):
         self.remove(self.last_icon)
         self.last_icon = icon
 
-        x = x = int(Gdk.Screen.width() - style.XLARGE_ICON_SIZE) / 2
-        y = (Gdk.Screen.height() / 2) - style.XLARGE_ICON_SIZE
+        x = x = int(gtk.gdk.screen_width() - style.XLARGE_ICON_SIZE) / 2
+        y = (gtk.gdk.screen_height() / 2) - style.XLARGE_ICON_SIZE
         self.put(icon, x, y)
         self.show_all()
 
 
-class XoIcons(Gtk.Box):
+class XoIcons(gtk.HBox):
 
     __gsignals__ = {
-        'icon_changed': (GObject.SIGNAL_RUN_FIRST,
-                         GObject.TYPE_NONE, (GObject.TYPE_PYOBJECT,))}
+        'icon_changed': (gobject.SIGNAL_RUN_FIRST,
+                         gobject.TYPE_NONE, (gobject.TYPE_PYOBJECT,))}
 
     def __init__(self, default):
-        super(XoIcons, self).__init__(orientation=Gtk.Orientation.HORIZONTAL)
+        super(XoIcons, self).__init__()
 
         path = os.path.join(os.path.expanduser('~'), '.icons')
         self.is_default = default
@@ -142,7 +142,7 @@ class XoIcons(Gtk.Box):
 
     def fill_list(self, icons):
 
-        client = GConf.Client.get_default()
+        client = gconf.client_get_default()
         path = '/desktop/sugar/user/color'
         color = client.get_string(path)
         global xocolor
@@ -155,9 +155,12 @@ class XoIcons(Gtk.Box):
             icon = Icon(icon_name=icon_name, xo_color=xocolor,
                         pixel_size=style.MEDIUM_ICON_SIZE)
 
-            icon_box = Gtk.EventBox()
+            icon_box = gtk.EventBox()
             icon_box.add(icon)
             icon_box.connect('button-press-event', self.update)
+            icon_box.modify_bg(gtk.STATE_NORMAL,
+                                gtk.gdk.color_parse('white'))
+
             size = style.MEDIUM_ICON_SIZE + 20
             icon_box.set_size_request(size, size)
 
@@ -170,7 +173,7 @@ class XoIcons(Gtk.Box):
             icon_box.set_property('has-tooltip', False)
 
             self.pack_start(icon_box, False, False, 0)
-            self.pack_start(Gtk.VSeparator(), False, False, 3)
+            self.pack_start(gtk.VSeparator(), False, False, 3)
 
             if icon_name == current:
                 self.icon = icon_fixed
@@ -191,35 +194,35 @@ class XoIcons(Gtk.Box):
         self.icon_real.set_sensitive(False)
 
 
-class XoIcon(Gtk.Box):
+class XoIcon(gtk.VBox):
 
     def __init__(self, activity_path, default):
-        super(XoIcon, self).__init__(orientation=Gtk.Orientation.VERTICAL)
+        super(XoIcon, self).__init__()
 
         self.icons = XoIcons(default)
         self.home = XoHome(self.icons.get_icon(), activity_path)
 
         self.icons.connect('icon_changed', self.home.update)
 
-        self.home_box = Gtk.EventBox()
-        self.home_box.modify_bg(Gtk.StateType.NORMAL,
-                                Gdk.color_parse('white'))
+        self.home_box = gtk.EventBox()
+        self.home_box.modify_bg(gtk.STATE_NORMAL,
+                                gtk.gdk.color_parse('white'))
         self.home_box.add(self.home)
 
-        self.icons_box = Gtk.EventBox()
-        self.icons_box.modify_bg(Gtk.StateType.NORMAL,
-                                 Gdk.color_parse('white'))
+        self.icons_box = gtk.EventBox()
+        self.icons_box.modify_bg(gtk.STATE_NORMAL,
+                                 gtk.gdk.color_parse('white'))
         self.icons_box.add(self.icons)
 
-        self.icons_scroll = Gtk.ScrolledWindow()
-        self.icons_scroll.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                     Gtk.PolicyType.AUTOMATIC)
+        self.icons_scroll = gtk.ScrolledWindow()
+        self.icons_scroll.set_policy(gtk.POLICY_AUTOMATIC,
+                                     gtk.POLICY_AUTOMATIC)
         self.icons_scroll.add_with_viewport(self.icons_box)
 
         self.icons_scroll.set_size_request(-1, style.MEDIUM_ICON_SIZE + 30)
 
         self.pack_start(self.home_box, True, True, 0)
-        self.pack_start(Gtk.HSeparator(), False, False, 0)
+        self.pack_start(gtk.HSeparator(), False, False, 0)
         self.pack_start(self.icons_scroll, False, False, 0)
 
         self.show_all()
