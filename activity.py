@@ -39,6 +39,8 @@ from Widgets import XoIcon
 
 from gettext import gettext as _
 
+from jarabe import config
+
 SUGAR_ICON_PATH = 'sugar/scalable/device'
 DEFAULT_ICON = 'computer-xo'
 CONTROL_PANEL_ICON = 'module-about_me'
@@ -73,7 +75,7 @@ class IconChangeActivity(activity.Activity):
         # We need: ~/.icons/sugar/scalabale/device/
         #          ~/.icons/computer-xo.svg
         #          ~/.icons/sugar/index.theme
-        root_path = os.path.join(os.path.expanduser('~'), '.icons')
+        root_path = os.path.join(config.data_path, 'icons')
         if not os.path.exists(os.path.join(root_path)):
             subprocess.check_output(['mkdir', os.path.join(root_path)])
         if not os.path.exists(os.path.join(root_path, 'sugar')):
@@ -151,7 +153,7 @@ class IconChangeActivity(activity.Activity):
         self.notify_alert()
 
     def write(self, icon):
-        root_path = os.path.join(os.path.expanduser('~'), '.icons')
+        root_path = os.path.join(config.data_path, 'icons')
         to_path = os.path.join(root_path, SUGAR_ICON_PATH,
                                DEFAULT_ICON + '.svg')
         to_path_two = os.path.join(root_path, SUGAR_ICON_PATH,
